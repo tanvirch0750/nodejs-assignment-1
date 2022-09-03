@@ -13,10 +13,11 @@ module.exports.createUser = (req, res) => {
     name === '' ||
     gender === '' ||
     contact === '' ||
+    typeof contact !== 'number' ||
     address === '' ||
     photoUrl === ''
   ) {
-    return res.send('Plese provide all the credentials');
+    return res.send('Plese provide all valid credentials');
   }
 
   const newUser = { id: newUserId, ...req.body };
