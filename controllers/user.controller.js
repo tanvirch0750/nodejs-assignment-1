@@ -80,18 +80,22 @@ module.exports.updateUserData = (req, res) => {
   const existUsers = utilFunction.getUserData();
 
   const foundUser = existUsers.find((user) => user.id === id);
-
   if (!foundUser) {
     return res.send(`user with id ${id} does not exist`);
   }
 
   const updatedUsers = existUsers.map((user) => {
     if (user.id === id) {
-      if (name) return { ...user, name };
-      if (gender) return { ...user, gender };
-      if (contact) return { ...user, contact };
-      if (address) return { ...user, address };
-      if (photoUrl) return { ...user, photoUrl };
+      if (name || gender || contact || address || photoUrl) {
+        return {
+          id: user.id,
+          name: name || user.name,
+          gender: gender || user.gender,
+          contact: contact || user.contact,
+          address: address || user.address,
+          photoUrl: photoUrl || user.photoUrl,
+        };
+      }
     } else {
       return user;
     }
@@ -99,4 +103,21 @@ module.exports.updateUserData = (req, res) => {
 
   utilFunction.saveUserData(updatedUsers);
   res.send(`user with id ${id} has been updated`);
+};
+
+module.exports.bulkUpdate = (req, res) => {
+  const ids = req.body;
+  const existUsers = utilFunction.getUserData();
+  const key = 'id';
+  const updatedBulkUsers = existUsers.map((user) => {
+    const foundUser = ids.find((i) => i[key] === user[key]);
+
+    if (foundUser) {
+      user = Object.assign(user, foundUser);
+    }
+    return user;
+  });
+
+  utilFunction.saveUserData(updatedBulkUsers);
+  res.send(`Bulk Update successfull`);
 };
